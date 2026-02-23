@@ -1,0 +1,11 @@
+# Credentials - never commit
+gcp-oauth.keys.json
+
+# Token storage (if copied locally)
+tokens.json
+
+# Personal data - journals, goals, commitments
+data/
+
+# MCP config (may contain paths/credentials)
+.mcp.json
