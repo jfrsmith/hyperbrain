@@ -216,17 +216,29 @@ Parse "Last touched" dates in commitments.md. Flag items where:
 End-of-day reflection (5 minutes). Run before closing for the day.
 
 ### Steps:
-1. Read today's journal entry to see morning intentions
-2. Ask:
+1. Get current time using `mcp__google-calendar__get-current-time`
+2. Fetch today's calendar events using `mcp__google-calendar__list-events`
+3. Read today's journal entry to see morning intentions
+4. **Check for undebriefed meetings**:
+   - Filter calendar to real meetings (same logic as debrief command)
+   - Only include meetings that have already happened (end time < now)
+   - Check if each meeting appears in the journal's "## Meeting Notes" section
+   - If any meetings are missing, prompt: "These meetings haven't been debriefed yet: [list]. Want to debrief them now before wrapping up?"
+   - If user says yes, run through debrief flow for each missing meeting
+   - If user says no/skip, continue with eod
+5. Ask:
    - "What got done today?" (capture accomplishments)
    - "What didn't get done that was planned?" (understand why)
    - "Anything that needs follow-up tomorrow?"
    - "Quick pulse: How do you feel about today?" (energy, satisfaction)
-3. Update `commitments.md`:
+6. Update `commitments.md`:
    - Update "Last touched" dates for items worked on
    - Mark completed items with [x] or move to archive
-4. Write end-of-day summary to today's journal file
-5. Note what carries forward to tomorrow
+7. Write end-of-day summary to today's journal file
+8. Note what carries forward to tomorrow
+
+### Meeting Debrief Check:
+To determine if a meeting has been debriefed, look for its name (or close match) under "## Meeting Notes" in today's journal. A meeting is considered debriefed if there's a subsection like `### Meeting Name (time)`.
 
 ### Journal Entry Format:
 ```markdown
