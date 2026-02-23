@@ -1,7 +1,7 @@
 ---
 name: hyperbrain
-description: Work management system for tracking goals, commitments, and daily progress. Subcommands: morning (daily planning), capture (add commitment), debrief (process meetings), review (status check), eod (end of day), weekly (strategic review).
-argument-hint: [morning|capture|debrief|review|eod|weekly] [optional args]
+description: "Work management system for tracking goals, commitments, and daily progress. Subcommands: morning (daily planning), capture (add commitment), debrief (process meetings), review (status check), eod (end of day), weekly (strategic review)."
+argument-hint: "[morning|capture|debrief|review|eod|weekly] [optional args]"
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, AskUserQuestion, mcp__google-calendar__list-events, mcp__google-calendar__get-current-time, mcp__google-calendar__list-calendars, mcp__google-calendar__get-freebusy
 ---
 
