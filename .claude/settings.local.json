@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "mcp__google-calendar__get-current-time",
-      "mcp__google-calendar__list-events"
-    ]
-  }
-}

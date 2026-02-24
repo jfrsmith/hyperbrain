@@ -7,5 +7,16 @@ tokens.json
 # Personal data - journals, goals, commitments
 data/
 
+# Credential storage within data (explicit for clarity)
+data/.credentials/
+
+# Python virtual environment and cache
+scripts/.venv/
+__pycache__/
+*.pyc
+
 # MCP config (may contain paths/credentials)
 .mcp.json
+
+# Local Claude settings (user-specific permissions)
+.claude/settings.local.json

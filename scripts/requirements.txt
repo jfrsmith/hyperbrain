@@ -1,0 +1,15 @@
+# Google Meet Transcript & Smart Notes Fetcher Dependencies
+# Install: pip install -r requirements.txt
+
+# Google Meet API client
+google-apps-meet>=0.1.0
+
+# Google API Python client (for Drive API)
+google-api-python-client>=2.100.0
+
+# OAuth authentication
+google-auth-oauthlib>=1.1.0
+google-auth>=2.23.0
+
+# HTTP client (for Smart Notes v2beta REST calls)
+requests>=2.28.0

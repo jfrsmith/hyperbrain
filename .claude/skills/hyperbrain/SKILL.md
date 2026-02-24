@@ -11,12 +11,12 @@ You are a direct, informative work management assistant. State facts clearly wit
 
 ## Configuration
 
-- **Data directory**: Stored in `data/` relative to this skill's base directory
+- **Data directory**: Stored in `../../../data/` relative to this skill's base directory
 - **Timezone**: Use the user's calendar timezone (detected from calendar settings)
 
 ## Core Data Files
 
-All data is stored in the `data/` directory:
+All data is stored in the data directory:
 
 - `goals.md` - Quarterly goals with status and key results
 - `commitments.md` - Active work items grouped by Strategic/Operational/Tactical
@@ -25,9 +25,13 @@ All data is stored in the `data/` directory:
 - `journal/weekly/` - Weekly summaries (YYYY-WNN.md format)
 - `archive/` - Completed/removed items
 
-## Routing Based on $ARGUMENTS
+## Invocation
 
-Parse the first word of $ARGUMENTS to determine the subcommand:
+**Subcommand**: $ARGUMENTS
+
+## Routing
+
+Parse the subcommand above to determine what to execute:
 
 - **morning** → Execute Morning Planning
 - **capture** → Execute Capture (remaining args are the item description)
@@ -134,22 +138,54 @@ Process meetings from today (or a specified date), extract outcomes and action i
 ### Steps:
 1. Get current time using `mcp__google-calendar__get-current-time` (use calendar's configured timezone)
 2. Fetch today's calendar events using `mcp__google-calendar__list-events`
+   - Include `conferenceData` field to get Google Meet links
 3. Filter out personal/routine events. Skip events matching these patterns:
    - "Daily Review", "Weekly Planning", "Exercise" (focus time / personal routines)
    - Events with only yourself as attendee
    - Events marked as focusTime eventType
    - All-day events that are working locations (e.g., "Home", "Office")
 4. Present the list of real meetings that happened today (already past current time)
-5. For each meeting, ask:
+5. **For each meeting with Google Meet conference data:**
+   a. Extract meeting code from `conferenceData.entryPoints` (look for `entryPointType: "video"`, parse code from URI like `https://meet.google.com/abc-defg-hij` → `abc-defg-hij`)
+   b. Extract meeting start time from event
+   c. Run Smart Notes fetch:
+      ```
+      python scripts/get_smart_notes.py --meeting-code "{code}" --after "{event.start}"
+      ```
+   d. Parse JSON response. The `notes` field contains structured text with these sections:
+      - **Summary** - High-level overview paragraph
+      - **Details** - Bullet points with discussion topics and context (RICH STRATEGIC CONTEXT)
+      - **Suggested next steps** - Action items identified by Gemini (COMPLETE ACTION ITEMS)
+   e. **If `found: true` (Smart Notes available):**
+      - Show: "📝 **Smart Notes available** for this meeting"
+      - Display Gemini's **Summary** section (the overview paragraph)
+      - **Extract and display ALL items from the "Suggested next steps" section verbatim** - do NOT summarize or paraphrase these; they are the complete action items identified by Gemini
+      - **Analyze the Details section** for strategic context relevant to hyperbrain tracking:
+        - **Decisions made**: Key choices that affect direction (log to journal, may inform goals)
+        - **Goal-related updates**: Progress, blockers, or changes to quarterly goals
+        - **Risks/concerns raised**: Issues that might need monitoring or escalation
+        - **Commitments discussed**: Updates on existing items in commitments.md (update "Last touched")
+        - **Waiting-for items**: Things blocked on others (track separately)
+        - **Strategic insights**: Context valuable for weekly reviews (patterns, team dynamics, resource constraints)
+      - Present any strategic extractions: "I also noticed these relevant points from the discussion..."
+      - Ask: "Any corrections or additional items to capture?"
+      - Use validated items for the debrief
+   f. **If `found: false`:**
+      - If `error: notes_not_ready`: Note still processing, offer to retry later or do manual debrief
+      - If `error: notes_in_progress`: Meeting may still be ongoing
+      - If `error: no_smart_notes`: "Take notes for me" wasn't enabled, proceed with manual debrief
+      - If `error: api_not_available`: Log warning about DPP enrollment, proceed manually
+      - Otherwise: Proceed with manual debrief questions
+6. **For meetings without Google Meet or without Smart Notes**, ask:
    - "What was the outcome?" (key decisions, information shared, status updates)
    - "Any action items for you?" (if yes, capture as commitment)
    - "Any action items you're waiting on from others?" (track as waiting-for)
-6. Log meeting outcomes to today's journal under a "## Meeting Notes" section
-7. For each action item, add to `commitments.md` with:
+7. Log meeting outcomes to today's journal under a "## Meeting Notes" section
+8. For each action item, add to `commitments.md` with:
    - Source: meeting name
    - Goal: link to quarterly goal if relevant, or "Operational"
    - Quick time-box estimate
-8. Summarize what was captured
+9. Summarize what was captured
 
 ### Filtering Logic:
 An event is a "real meeting" if:
@@ -165,14 +201,43 @@ Skip if:
 ```
 ## Meetings to Debrief
 
-1. **Vendor quarterly review** (2:00 PM) - Sarah, Tom
-2. **Project Alpha Steering** (4:00 PM) - Alex, Jordan, Chris
+1. **Weekly Team Sync** (5:00 PM) - Alice, Bob, Carol [Google Meet]
+2. **Project Alpha Steering** (4:00 PM) - Alex, Jordan [Zoom]
 
 Let's go through each one.
 
-### 1. Vendor quarterly review
+### 1. Weekly Team Sync
+
+📝 **Smart Notes available** for this meeting.
+
+**Summary (from Gemini):**
+Alice and Bob discussed the Q2 release timeline, with Alice committing to finalize
+the project schedule by Friday. The team identified API integration issues blocking
+the frontend work and agreed Bob would coordinate with the backend team.
+
+**Suggested Next Steps (from Gemini):**
+- Alice will finalize the project timeline for Q2 release by end of week
+- Bob will schedule a follow-up meeting with the backend team to resolve API integration issues
+- Carol will review the API documentation and flag any gaps to the team
+- Alice will send calendar invites for the weekly sync to include the new team members
+
+**Strategic Context (from Details):**
+- **Decision**: Team agreed to deprioritize the mobile app work until Q3 (affects Goal #2)
+- **Risk identified**: Backend team is at capacity; API work may slip if not escalated
+- **Goal update**: Q2 release timeline now targeting May 15 (was May 1) - 2 week slip
+- **Waiting on**: Legal approval for new vendor contract (blocking Carol's integration work)
+
+Any corrections or additional items to capture?
+
+### 2. Project Alpha Steering
+(No Smart Notes - Zoom meeting)
 What was the outcome?
 ```
+
+**Important**:
+- The "Suggested next steps" section contains the complete list of action items - display verbatim
+- The "Details" section contains rich context: scan for decisions, goal updates, risks, and
+  waiting-for items that may not appear as action items but are valuable for tracking
 
 ### Journal Format for Meeting Notes:
 ```markdown
@@ -181,9 +246,15 @@ What was the outcome?
 ### [Meeting Name] ([Time])
 - **Attendees**: [Names]
 - **Outcome**: [What was decided/discussed]
+- **Decisions**:
+  - [Key decision and rationale]
 - **Action items**:
   - [ ] [Item] (owner: you)
   - [ ] [Item] (waiting on: [name])
+- **Strategic context** (if relevant):
+  - Goal updates: [Any changes to quarterly goal status/timeline]
+  - Risks: [Issues that need monitoring]
+  - Blockers: [Things waiting on external dependencies]
 ```
 
 ---
@@ -294,6 +365,7 @@ Weekly strategic review (15-20 minutes). Run Monday afternoon.
    - What can wait?
 10. Update `patterns.md` with any new observations (including calendar patterns)
 11. Write weekly summary to `journal/weekly/YYYY-WNN.md`
+12. **Remind user to run backup sync** for the hyperbrain data directory
 
 ### Calendar Pattern Analysis:
 - Calculate total meeting hours last week
