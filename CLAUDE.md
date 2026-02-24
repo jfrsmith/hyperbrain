@@ -23,6 +23,19 @@ Error: File has been unexpectedly modified. Read it again before attempting to w
 
 This applies to Read, Edit, and Write tool calls.
 
+## Sensitive Information in Files
+
+**Public files** (anything outside `data/`) will be committed to git and pushed to a public repository. When editing these files:
+
+- Never include real names, email addresses, or company references
+- Never reference specific work items, meeting content, or journal entries
+- Use generic placeholder examples (e.g., "Alice", "PR #1234", "Project X")
+- Don't copy content from `data/` files into public files
+
+**Private files** (`data/` directory) contain personal information and are gitignored. Sensitive content is expected and fine here.
+
+The key principle: **don't let sensitive information enter public files in the first place.** The commit check below is a safety net, not the primary control.
+
 ## Git Commits
 
 Before committing any changes, always run a full sanitization check:
