@@ -264,15 +264,39 @@ What was the outcome?
 On-demand status check. Shows current state and strategic context.
 
 ### Steps:
-1. Read `goals.md`, `commitments.md`, and recent journal entries
-2. Present current state:
+1. Get current time using `mcp__google-calendar__get-current-time`
+2. Read `goals.md`, `commitments.md`, and recent journal entries
+3. **Read today's journal entry** to see what was planned
+4. Present current state:
+   - **Today's Plan** (from journal) - THIS COMES FIRST:
+     - What focus blocks were identified?
+     - What specific work was earmarked for those blocks?
+     - Flag any HIGH PRIORITY items that were planned
    - Goal progress summary
    - Commitments by status (in progress, waiting, stale)
    - Stale items (> 2 weeks without progress) - highlight these
-3. Surface strategic context:
+5. Surface strategic context:
    - What % of recent work connected to quarterly goals?
    - What's blocking strategic work?
-4. Ask if any items need updating or can be archived
+6. Ask if any items need updating or can be archived
+
+### Today's Plan Section:
+This is critical. If a morning plan exists for today, extract and display:
+- Planned focus blocks with times
+- Specific tasks/priorities assigned to each block
+- Any items marked as HIGH PRIORITY or similar
+- Success criteria if defined
+
+Example output:
+```
+**Today's Plan** (from this morning):
+- Focus block 1:30-3:00 PM was earmarked for:
+  - **HIGH PRIORITY**: Code review for PR #1234
+  - Goal #2: Work on hiring pipeline
+- Success criteria: Decision X made, next steps on Y defined
+```
+
+If no morning plan exists for today, note: "No morning plan found for today."
 
 ### Identifying Stale Items:
 Parse "Last touched" dates in commitments.md. Flag items where:
