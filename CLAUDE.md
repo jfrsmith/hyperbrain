@@ -22,3 +22,17 @@ Error: File has been unexpectedly modified. Read it again before attempting to w
 - Good: `data/journal/2026-02-23.md`
 
 This applies to Read, Edit, and Write tool calls.
+
+## Git Commits
+
+Before committing any changes, always run a full sanitization check:
+
+1. Review all staged files for sensitive data:
+   - Absolute local paths
+   - Email addresses, names, or company references
+   - Credentials, API keys, tokens
+   - Meeting content, journal entries, or personal notes
+2. Use `git diff --staged` to inspect changes
+3. Search tracked files: `git ls-files | xargs grep -E "pattern"`
+
+The `data/` directory contains personal information and is gitignored. Never commit files from `data/`.
