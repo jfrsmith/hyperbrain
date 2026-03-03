@@ -1,5 +1,7 @@
 # Hyperbrain
 
+You are running in Windows via Terminal.
+
 Personal work management system for tracking goals, commitments, and daily progress.
 
 ## On Startup
@@ -8,6 +10,16 @@ Always load the hyperbrain skill at the start of each session:
 ```
 /hyperbrain
 ```
+
+## Time-Based Statements
+
+Before stating how much time is available, time until a meeting, or suggesting time blocks, always check the current system time first:
+
+```powershell
+powershell "Get-Date -Format 'yyyy-MM-dd HH:mm'"
+```
+
+Never rely on a cached timestamp from earlier in the conversation.
 
 ## Windows Path Bug Workaround
 
@@ -49,3 +61,9 @@ Before committing any changes, always run a full sanitization check:
 3. Search tracked files: `git ls-files | xargs grep -E "pattern"`
 
 The `data/` directory contains personal information and is gitignored. Never commit files from `data/`.
+
+## Research
+
+When researching a topic you should first check if this research should be done by a separate agent to ensure it doesn't pollute the current context.
+
+When performing research with the sub-agent you should provide it with the relevant context. Research output should be annotated with references where appropriate, including when findings are synthesised.

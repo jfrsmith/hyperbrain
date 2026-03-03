@@ -6,13 +6,15 @@ A Claude Code skill for daily work management with calendar integration.
 
 Hyperbrain helps maintain strategic focus by tracking goals, commitments, and daily progress. It integrates with Google Calendar to understand your schedule and identify available focus time.
 
+The skill triggers automatically on work management phrases like "what should I work on", "start my day", "am I making progress on my goals", or any discussion of planning, priorities, and time management.
+
 ## Commands
 
 | Command | Description |
 |---------|-------------|
 | `/hyperbrain morning` | Daily planning - shows calendar, goals, commitments, identifies focus time |
 | `/hyperbrain capture [item]` | Quick-add a commitment with context |
-| `/hyperbrain debrief` | Process meetings from today, extract outcomes and action items |
+| `/hyperbrain debrief` | Process meetings from today, fetch transcripts, extract outcomes and action items |
 | `/hyperbrain review` | On-demand status check of goals and commitments |
 | `/hyperbrain eod` | End-of-day reflection, checks for undebriefed meetings |
 | `/hyperbrain weekly` | Weekly strategic review with calendar pattern analysis |
@@ -30,6 +32,15 @@ Hyperbrain helps maintain strategic focus by tracking goals, commitments, and da
    - `archive/` - Completed items
 
 The `data/` directory contains personal information and is gitignored.
+
+## Skill Structure
+
+```
+.claude/skills/hyperbrain/
+├── SKILL.md              # Core skill instructions (~250 lines)
+└── references/
+    └── output-formats.md # Templates for journals, meetings, weekly reviews
+```
 
 ## Philosophy
 
