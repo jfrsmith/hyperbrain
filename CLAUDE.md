@@ -50,15 +50,15 @@ The key principle: **don't let sensitive information enter public files in the f
 
 ## Git Commits
 
-Before committing any changes, always run a full sanitization check:
+**REQUIRED: Run this checklist BEFORE every `git commit` command:**
 
-1. Review all staged files for sensitive data:
-   - Absolute local paths
-   - Email addresses, names, or company references
-   - Credentials, API keys, tokens
-   - Meeting content, journal entries, or personal notes
-2. Use `git diff --staged` to inspect changes
-3. Search tracked files: `git ls-files | xargs grep -E "pattern"`
+- [ ] `git diff --staged` - review all changes line by line
+- [ ] Check for: absolute paths, real names, emails, company references
+- [ ] Check for: credentials, API keys, tokens
+- [ ] Check for: meeting content, journal entries, personal notes from `data/`
+- [ ] Verify no files from `data/` are staged
+
+Do not skip this check. Do not assume changes are safe because you wrote them.
 
 The `data/` directory contains personal information and is gitignored. Never commit files from `data/`.
 
